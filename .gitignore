@@ -1,0 +1,12 @@
+# Local environment secrets
+.env
+*.json
+!routing_rules.json
+
+# Python artifacts
+__pycache__/
+*.pyc
+
+# Environment folders (if you use them)
+venv/
+.venv/
