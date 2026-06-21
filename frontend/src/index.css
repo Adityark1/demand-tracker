@@ -1,0 +1,4 @@
+@import "tailwindcss";
+
+/* Force Tailwind v4 to scan every React file inside your src folder */
+@source "./**/*.{js,jsx,ts,tsx}";

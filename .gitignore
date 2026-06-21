@@ -1,9 +1,9 @@
-# Local environment secrets
+# Secrets
 .env
-*.json
-!routing_rules.json
+*.env
+service_account.json
 
-# Python artifacts
+# Python
 __pycache__/
 *.pyc
 
@@ -11,6 +11,23 @@ __pycache__/
 venv/
 .venv/
 
+# Logs
+*.log
+error.log
+output.log
+
 # React / Node
 node_modules/
 dist/
+
+# Vite
+.vite/
+
+# macOS
+.DS_Store
+
+# VS Code
+.vscode/
+
+# Build artifacts
+coverage/
