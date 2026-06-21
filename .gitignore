@@ -7,6 +7,10 @@
 __pycache__/
 *.pyc
 
-# Environment folders (if you use them)
+# Virtual environments
 venv/
 .venv/
+
+# React / Node
+node_modules/
+dist/
