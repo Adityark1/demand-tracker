@@ -105,10 +105,12 @@ def get_dashboard_stats(db: Session = Depends(get_db)):
 
 @app.get("/api/demands", response_model=List[schemas.DemandOut])
 def get_all_demands(db: Session = Depends(get_db)):
+    """Returns all demands including email_subject and email_body via DemandOut schema."""
     return db.query(models.Demand).order_by(models.Demand.created_at.desc()).all()
 
 @app.get("/api/demands/{id}", response_model=schemas.DemandOut)
 def get_demand_by_id(id: int, db: Session = Depends(get_db)):
+    """Returns a specific demand by ID including email_subject and email_body via DemandOut schema."""
     demand = db.query(models.Demand).filter(models.Demand.id == id).first()
     if not demand:
         raise HTTPException(status_code=404, detail="Demand not found.")
@@ -116,7 +118,8 @@ def get_demand_by_id(id: int, db: Session = Depends(get_db)):
 
 @app.get("/api/demands/by-demand-id/{demand_id}", response_model=schemas.DemandOut)
 def get_demand_by_business_id(demand_id: str, db: Session = Depends(get_db)):
-    demand = db.query(models.Demand).filter(models.Demand.id == demand_id).first()
+    """Returns a specific demand by business demand_id string."""
+    demand = db.query(models.Demand).filter(models.Demand.demand_id == demand_id).first()
     if not demand:
         raise HTTPException(status_code=404, detail=f"Demand {demand_id} not found.")
     return demand

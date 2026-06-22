@@ -1,4 +1,3 @@
-
 from datetime import datetime
 from sqlalchemy import Column, Integer, String, Text, DateTime, Boolean
 from .database import Base
@@ -47,6 +46,10 @@ class Demand(Base):
     created_at = Column(DateTime, default=datetime.utcnow)
     updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
     source_type = Column(Text, default="Unknown")
+    
+    # New ORM Mappings for Tracking Full Raw Email Context
+    email_subject = Column(Text, nullable=True)
+    email_body = Column(Text, nullable=True)
 
 
 class ProcessedEmail(Base):

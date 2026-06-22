@@ -57,6 +57,10 @@ class DemandOut(BaseModel):
     created_at: datetime
     updated_at: datetime
     source_type: Optional[str] = "Unknown"
+    
+    # New fields added to retrieve raw email text via API
+    email_subject: Optional[str] = None
+    email_body: Optional[str] = None
 
     class Config:
         from_attributes = True
@@ -77,6 +81,10 @@ class DemandUpdate(BaseModel):
     requisition_id: Optional[str] = None
     notes: Optional[str] = None
     source_type: Optional[str] = None
+    
+    # New fields added to optionally permit edits to raw text via PATCH updates
+    email_subject: Optional[str] = None
+    email_body: Optional[str] = None
 
     class Config:
         from_attributes = True

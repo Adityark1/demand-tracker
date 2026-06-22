@@ -71,6 +71,10 @@ class Demand(Base):
     message_id = Column(String(255), unique=True, nullable=False, index=True)
     requisition_created = Column(Boolean, default=False)
     created_at = Column(DateTime, default=datetime.utcnow)
+    
+    # New Columns added for tracking raw context
+    email_subject = Column(Text, nullable=True)
+    email_body = Column(Text, nullable=True)
 
 engine = create_engine(DATABASE_URL, pool_pre_ping=True)
 SessionLocal = sessionmaker(bind=engine)
@@ -202,17 +206,13 @@ def process_emails():
         mail.select("inbox")
         
         # 1. READ LAST SCAN TIME FROM DATABASE
-        # Fetch the creation time of the most recent demand record processed.
         last_scan_time = db.query(func.max(Demand.created_at)).scalar()
         
         if last_scan_time:
-            # Look back an extra 24 hours from the last record to ensure no emails 
-            # are missed due to processing delays or timezone alignment.
             search_date = (last_scan_time - timedelta(days=1)).strftime("%d-%b-%Y")
             search_criterion = f'(SINCE "{search_date}")'
             logger.info(f"Scanning emails newer than baseline tracking window (SINCE {search_date}).")
         else:
-            # Fallback for a clean/empty database: scan everything
             search_criterion = "ALL"
             logger.info("No prior scan logs found. Executing full mailbox scan sweep.")
 
@@ -241,7 +241,7 @@ def process_emails():
                         metrics["skipped"] += 1
                         continue
 
-                    # 3. MESSAGE-ID DEDUPLICATION (The absolute source of truth)
+                    # 3. MESSAGE-ID DEDUPLICATION
                     existing_demand = db.query(Demand).filter(Demand.message_id == message_id).first()
                     if existing_demand:
                         metrics["skipped"] += 1
@@ -329,7 +329,6 @@ def process_emails():
                     priority = determine_priority(subject, body)
 
                     # 4. WRITE RECORD AND AUTOMATICALLY REFRESH LAST SCAN TIME
-                    # Appending this record inherently advances the `func.max(Demand.created_at)` value for the subsequent scan iteration.
                     demand_record = Demand(
                         demand_id=f"DM-{int(time.time())}-{e_id.decode()}",
                         client_name=client_name,
@@ -343,7 +342,9 @@ def process_emails():
                         source_type=source_type,
                         message_id=message_id,
                         requisition_created=False,
-                        created_at=datetime.utcnow()
+                        created_at=datetime.utcnow(),
+                        email_subject=subject,  # Injected full raw subject
+                        email_body=body        # Injected full raw un-truncated body
                     )
 
                     db.add(demand_record)
